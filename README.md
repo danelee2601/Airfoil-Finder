@@ -27,9 +27,8 @@
 1. Airfoil_Finder폴더 내 "my_airfoil" 폴더안에, 자신이 가지고있는 airfoil좌표데이터를 넣는다.<br> 
 &nbsp;&nbsp;* 유의사항: <br>
 &nbsp;&nbsp;(a) 확장자는 txt, csv, dat 이여야 할것<br>
-&nbsp;&nbsp;(b) 구분자(seperator)를 기억할것, 보통 tab or comma or space 들이 사용됨<br>
-&nbsp;&nbsp;(c) my_airfoil 폴더안에는 하나의 airfoil좌표데이터만 넣을것 (프로그램이 하나의 given airfoil 에 대해서, 데이터베이스안의 airfoil 들과 비교하기때문에)<br>
-&nbsp;&nbsp;(d) my_airfoil폴더안에 airfoil좌표데이터 예시로 "Tmotor.txt"가 들어있음. <br>
+&nbsp;&nbsp;(b) my_airfoil 폴더안에는 하나의 airfoil좌표데이터만 넣을것 (프로그램이 하나의 given airfoil 에 대해서, 데이터베이스안의 airfoil 들과 비교하기때문에)<br>
+&nbsp;&nbsp;(c) my_airfoil폴더안에 airfoil좌표데이터 예시로 "Tmotor.txt"가 들어있음. <br>
 
 
 2. Airfoil_Finder 폴더안에 main.py 를 편집기(e.g. Pycharm)로 연다.<br>
