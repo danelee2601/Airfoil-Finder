@@ -9,13 +9,13 @@ import time
 
 
 class AirfoilFinder(object):
-    def __init__(self, sep_for_the_input_airfoil_data, plot_my_airfoil=False, n_the_most_similar_foils=3):
+    def __init__(self, plot_my_airfoil=False, n_the_most_similar_foils=3):
         """
         :param sep_for_the_input_airfoil_data: seperator for the input airfoil data file. For example, '\t' -> data is seperated by tab || ' ' -> data is seperated by one space, ',' -> seperated by comma(,)
         """
         self.plot_figsize = (16, 5)
 
-        self.my_airfoil = self.get_my_airfoil(sep_for_the_input_airfoil_data, plot_my_airfoil)
+        self.my_airfoil = self.get_my_airfoil(plot_my_airfoil)
         self.airfoil_data_names_from_database = []
         self.process_UIUC_airfoil_database_dir()
 
@@ -492,14 +492,15 @@ class AirfoilFinder(object):
         num_airfoils_in_database = len(self.dict_airfoil_database.keys())
         dict_airfoil_database_items_list = list(self.dict_airfoil_database.items())
 
-        upper_side_my_airfoil, lower_side_my_airfoil = self.sort_into_upper_lower_sides(
-            df=pd.DataFrame(self.my_airfoil))
+        upper_side_my_airfoil, lower_side_my_airfoil = self.sort_into_upper_lower_sides(df=pd.DataFrame(self.my_airfoil))
 
-        # save the plot - test
-        # plt.plot(upper_side_my_airfoil[:, 0], upper_side_my_airfoil[:, 1])
-        # plt.plot(lower_side_my_airfoil[:, 0], lower_side_my_airfoil[:, 1])
-        # plt.savefig('./upper_lower_sorted_imgs-test/my_airfoil.png')
-        # plt.cla()
+        save_fig = True
+        if save_fig:
+            # save the plot - test
+            plt.plot(upper_side_my_airfoil[:, 0], upper_side_my_airfoil[:, 1])
+            plt.plot(lower_side_my_airfoil[:, 0], lower_side_my_airfoil[:, 1])
+            plt.savefig('./upper_lower_sorted_imgs-test/my_airfoil.png')
+            plt.cla()
 
         for idx, foil_data in enumerate(dict_airfoil_database_items_list):
             airfoil_data_name = foil_data[0]
@@ -531,13 +532,14 @@ class AirfoilFinder(object):
             # plt.grid()
             # plt.show()
 
-            # save the plot - test
-            # print("airfoil_data_name: ", airfoil_data_name)
-            # plt.plot(upper_side_airfoil_data_arr[:, 0], upper_side_airfoil_data_arr[:, 1])
-            # plt.plot(lower_side_airfoil_data_arr[:, 0], lower_side_airfoil_data_arr[:, 1])
-            # plt.savefig('./upper_lower_sorted_imgs-test/{}.png'.format(airfoil_data_name.split('.')[0]))
-            # plt.cla()
-            # print('\n')
+            if save_fig:
+                # save the plot - test
+                print("airfoil_data_name: ", airfoil_data_name)
+                plt.plot(upper_side_airfoil_data_arr[:, 0], upper_side_airfoil_data_arr[:, 1])
+                plt.plot(lower_side_airfoil_data_arr[:, 0], lower_side_airfoil_data_arr[:, 1])
+                plt.savefig('./upper_lower_sorted_imgs-test/{}.png'.format(airfoil_data_name.split('.')[0]))
+                plt.cla()
+                print('\n')
 
             upper_side_smaller_data, lower_side_smaller_data = 0, 0  # initialized
             upper_side_bigger_data, lower_side_bigger_data = 0, 0  # initialized
