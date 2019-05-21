@@ -5,6 +5,7 @@ import os
 from collections import deque
 import webbrowser
 import zipfile
+import time
 
 
 class AirfoilFinder(object):
@@ -83,7 +84,7 @@ class AirfoilFinder(object):
 
         return dat_only_list
 
-    def get_my_airfoil(self, sep, plot):
+    def get_my_airfoil(self, plot):
         """
         :param sep: seperator for the data file. For example, '\t' -> data is seperated by tab || ' ' -> data is seperated by one space
         :param plot:
@@ -96,8 +97,13 @@ class AirfoilFinder(object):
             print("======================================")
             assert False
 
-        df_my_airfoil = pd.read_csv("./my_airfoil/{}".format(listdir_[0]), header=None, sep=sep)
-        my_airfoil = df_my_airfoil.values
+        #df_my_airfoil = pd.read_csv("./my_airfoil/{}".format(listdir_[0]), header=None, sep=sep)
+        #my_airfoil = df_my_airfoil.values
+
+        my_airfoil, _ = self.sort_foildata("./my_airfoil/{}".format(listdir_[0]))
+
+        #pd.DataFrame(my_airfoil).to_csv('C:/temp02/my_airfoil_sorted.txt', header=None, index=None)
+        #time.sleep(99999)
 
         if plot:
             plt.figure(figsize=self.plot_figsize)
@@ -108,6 +114,72 @@ class AirfoilFinder(object):
 
         return my_airfoil
 
+    def sort_foildata(self, airfoil_data_name):
+        coordinates = []
+        airfoil_full_name = ''
+        with open('{}'.format(airfoil_data_name), 'r') as f:
+            idx_to_find_airfoil_name = 0
+
+            while True:
+                line = f.readline()
+                if idx_to_find_airfoil_name == 0:
+                    airfoil_full_name = '{}'.format(line)
+                    # print("airfoil_full_name: ", airfoil_full_name)
+
+                line_striped = line.strip()
+                line_striped_split = line_striped.split(' ')
+
+                line_striped_split_sorted = []
+                for i in line_striped_split:
+                    if i != '':
+                        line_striped_split_sorted.append(i)
+
+                if (len(line_striped_split_sorted) == 2) and ('1' in line_striped_split_sorted):
+                    line_striped_split_sorted = [line_striped_split_sorted[0] + line_striped_split_sorted[1]]
+
+                is_tab = False
+                for i in line_striped_split_sorted:
+                    if '\t' in i:
+                        is_tab = True
+
+                if is_tab:
+                    line_striped_split_sorted2 = []
+                    for i in line_striped_split_sorted:
+                        line_striped_split_sorted2.append(i.split('\t'))
+
+                    line_striped_split_sorted = line_striped_split_sorted2[0]
+
+                if len(line_striped_split_sorted) == 2:
+                    try:
+                        X_coord, Y_coord = line_striped_split_sorted
+
+                        try:
+                            X_coord, Y_coord = eval(X_coord), eval(Y_coord)
+                            X_coord, Y_coord = float(X_coord), float(Y_coord)
+
+                            if (X_coord <= 1.0) and (Y_coord <= 1.0):
+                                if (type(X_coord) != int) and (type(Y_coord) != int):
+                                    coordinates.append([X_coord, Y_coord])
+
+                        except (SyntaxError, NameError) as e:
+                            #print("e: ", e)
+                            #print("X_coord: ", X_coord)
+                            #print("Y_coord: ", Y_coord)
+                            #print('')
+                            pass
+
+                    except ValueError:
+                        #print("* ValueError")
+                        pass
+
+                idx_to_find_airfoil_name += 1
+
+                if not line:
+                    break
+
+        coordinates_arr = np.array(coordinates)
+        return coordinates_arr, airfoil_full_name
+
     def build_airfoil_database(self):
         print("* Building the database of the UIUC airfoils... *")
         number_of_airfoil_names_from_database = len(self.airfoil_data_names_from_database)
@@ -116,62 +188,9 @@ class AirfoilFinder(object):
         dict_airfoil_full_names = {}
 
         for idx, airfoil_data_name in enumerate(self.airfoil_data_names_from_database):
-            print("* Building the database of the UIUC airfoils... || Progress: {}/{}".format(idx + 1,
-                                                                                              number_of_airfoil_names_from_database))
+            print("* Building the database of the UIUC airfoils... || Progress: {}/{}".format(idx + 1, number_of_airfoil_names_from_database))
 
-            coordinates = []
-            airfoil_full_name = ''
-            with open('../UIUC_airfoil_database/{}'.format(airfoil_data_name), 'r') as f:
-                idx_to_find_airfoil_name = 0
-
-                while True:
-                    line = f.readline()
-                    if idx_to_find_airfoil_name == 0:
-                        airfoil_full_name = '{}'.format(line)
-                        # print("airfoil_full_name: ", airfoil_full_name)
-
-                    line_striped = line.strip()
-                    line_striped_split = line_striped.split(' ')
-
-                    line_striped_split_sorted = []
-                    for i in line_striped_split:
-                        if i != '':
-                            line_striped_split_sorted.append(i)
-
-                    is_tab = False
-                    for i in line_striped_split_sorted:
-                        if '\t' in i:
-                            is_tab = True
-
-                    if is_tab:
-                        line_striped_split_sorted2 = []
-                        for i in line_striped_split_sorted:
-                            line_striped_split_sorted2.append(i.split('\t'))
-
-                        line_striped_split_sorted = line_striped_split_sorted2[0]
-
-                    if len(line_striped_split_sorted) == 2:
-                        try:
-                            X_coord, Y_coord = line_striped_split_sorted
-
-                            try:
-                                X_coord, Y_coord = eval(X_coord), eval(Y_coord)
-
-                                if (X_coord <= 1.0) and (Y_coord <= 1.0):
-                                    if (type(X_coord) != int) and (type(Y_coord) != int):
-                                        coordinates.append([X_coord, Y_coord])
-                            except (SyntaxError, NameError) as e:
-                                pass
-
-                        except ValueError:
-                            pass
-
-                    idx_to_find_airfoil_name += 1
-
-                    if not line:
-                        break
-
-            coordinates_arr = np.array(coordinates)
+            coordinates_arr, airfoil_full_name = self.sort_foildata("../UIUC_airfoil_database/{}".format(airfoil_data_name))
 
             dict_airfoil_database['{}'.format(airfoil_data_name)] = coordinates_arr
             dict_airfoil_full_names['{}'.format(airfoil_data_name)] = airfoil_full_name
@@ -530,30 +549,34 @@ class AirfoilFinder(object):
                 upper_side_bigger_data, lower_side_bigger_data = upper_side_airfoil_data_arr, lower_side_airfoil_data_arr
                 upper_side_smaller_data, lower_side_smaller_data = upper_side_my_airfoil, lower_side_my_airfoil
 
-            # fit the bigger data to the format of the smaller data
-            # bigger_data_newX, bigger_data_newY = self.sort_by_linear_interpolation(smaller_data=smaller_data, bigger_data=bigger_data)
-            upper_side_bigger_data_newX, upper_side_bigger_data_newY = self.sort_by_linear_interpolation(
-                smaller_data=upper_side_smaller_data, bigger_data=upper_side_bigger_data)
-            lower_side_bigger_data_newX, lower_side_bigger_data_newY = self.sort_by_linear_interpolation(
-                smaller_data=lower_side_smaller_data, bigger_data=lower_side_bigger_data)
+            try:
+                # fit the bigger data to the format of the smaller data
+                # bigger_data_newX, bigger_data_newY = self.sort_by_linear_interpolation(smaller_data=smaller_data, bigger_data=bigger_data)
+                upper_side_bigger_data_newX, upper_side_bigger_data_newY = self.sort_by_linear_interpolation(
+                    smaller_data=upper_side_smaller_data, bigger_data=upper_side_bigger_data)
+                lower_side_bigger_data_newX, lower_side_bigger_data_newY = self.sort_by_linear_interpolation(
+                    smaller_data=lower_side_smaller_data, bigger_data=lower_side_bigger_data)
 
-            upper_new_bigger_data = np.vstack((upper_side_bigger_data_newX, upper_side_bigger_data_newY)).T
-            lower_new_bigger_data = np.vstack((lower_side_bigger_data_newX, lower_side_bigger_data_newY)).T
+                upper_new_bigger_data = np.vstack((upper_side_bigger_data_newX, upper_side_bigger_data_newY)).T
+                lower_new_bigger_data = np.vstack((lower_side_bigger_data_newX, lower_side_bigger_data_newY)).T
 
-            new_bigger_data = np.vstack((upper_new_bigger_data, lower_new_bigger_data))
-            smaller_data = np.vstack((upper_side_smaller_data, lower_side_smaller_data))
+                new_bigger_data = np.vstack((upper_new_bigger_data, lower_new_bigger_data))
+                smaller_data = np.vstack((upper_side_smaller_data, lower_side_smaller_data))
 
-            #print("new_bigger_data: ", new_bigger_data)
-            #print("smaller_data: ", smaller_data)
+                #print("new_bigger_data: ", new_bigger_data)
+                #print("smaller_data: ", smaller_data)
 
-            #plt.plot(new_bigger_data[:, 0], new_bigger_data[:, 1], '-o')  # my_airfoil
-            #plt.plot(smaller_data[:, 0], smaller_data[:, 1], '-o')
-            #plt.grid()
-            #plt.ylim(-0.04, 0.1)
-            #plt.show()
+                #plt.plot(new_bigger_data[:, 0], new_bigger_data[:, 1], '-o')  # my_airfoil
+                #plt.plot(smaller_data[:, 0], smaller_data[:, 1], '-o')
+                #plt.grid()
+                #plt.ylim(-0.04, 0.1)
+                #plt.show()
 
-            # get the mse(mean squared error) score
-            self.dict_mse_scores[airfoil_data_name] = np.mean((new_bigger_data - smaller_data) ** 2)
+                # get the mse(mean squared error) score
+                self.dict_mse_scores[airfoil_data_name] = np.mean((new_bigger_data - smaller_data) ** 2)
+
+            except IndexError as e:
+                pass
 
     def find_closest_val_idx(self, val, look_up_list):
         gaps = []
