@@ -488,13 +488,12 @@ class AirfoilFinder(object):
 
         return upper_side, lower_side
 
-    def find_similar_airfoil_to_my_airfoil_from_database(self):
+    def find_similar_airfoil_to_my_airfoil_from_database(self, save_fig=False):
         num_airfoils_in_database = len(self.dict_airfoil_database.keys())
         dict_airfoil_database_items_list = list(self.dict_airfoil_database.items())
 
         upper_side_my_airfoil, lower_side_my_airfoil = self.sort_into_upper_lower_sides(df=pd.DataFrame(self.my_airfoil))
 
-        save_fig = True
         if save_fig:
             # save the plot - test
             plt.plot(upper_side_my_airfoil[:, 0], upper_side_my_airfoil[:, 1])
@@ -534,12 +533,11 @@ class AirfoilFinder(object):
 
             if save_fig:
                 # save the plot - test
-                print("airfoil_data_name: ", airfoil_data_name)
+                #print("airfoil_data_name: ", airfoil_data_name)
                 plt.plot(upper_side_airfoil_data_arr[:, 0], upper_side_airfoil_data_arr[:, 1])
                 plt.plot(lower_side_airfoil_data_arr[:, 0], lower_side_airfoil_data_arr[:, 1])
                 plt.savefig('./upper_lower_sorted_imgs-test/{}.png'.format(airfoil_data_name.split('.')[0]))
                 plt.cla()
-                print('\n')
 
             upper_side_smaller_data, lower_side_smaller_data = 0, 0  # initialized
             upper_side_bigger_data, lower_side_bigger_data = 0, 0  # initialized
