@@ -5,12 +5,9 @@ import os
 ======================================================================================================================================
 * 함수 arguments 에 대한 설명 *
 
-1. sep_for_the_input_airfoil_data: 유저(user)가 input 으로 넣는 airfoil 좌표 데이터파일이, 어떤 "구분자" 로 나누어져있는지 명시.
-   - '\t':tab 으로 나뉨  //  ',':comma로 나뉨  //  ' ':space로 나뉨
+1. plot_my_airfoil: 유저가 input으로 넣는 airfoil 데이터를 plot 한다. (True or False)
 
-2. plot_my_airfoil: 유저가 input으로 넣는 airfoil 데이터를 plot 한다. (True or False)
-
-3. n_the_most_similar_foils: 최대 몇개까지 input으로 넣은 airfoil 과 가장 유사한 foil을 output 할지 결정한다.
+2. n_the_most_similar_foils: 최대 몇개까지 input으로 넣은 airfoil 과 가장 유사한 foil을 output 할지 결정한다.
 ======================================================================================================================================
 
 * 참고사항 *
@@ -19,6 +16,6 @@ import os
 """
 
 # Execute
-AirfoilFinder(sep_for_the_input_airfoil_data='\t', plot_my_airfoil=True, n_the_most_similar_foils=3)
+AirfoilFinder(plot_my_airfoil=True, n_the_most_similar_foils=3)
 
 
