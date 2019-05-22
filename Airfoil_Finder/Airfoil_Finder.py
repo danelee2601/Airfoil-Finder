@@ -692,5 +692,5 @@ class AirfoilFinder(object):
 
 
 if __name__ == "__main__":
-    finder = AirfoilFinder(sep_for_the_input_airfoil_data='\t')
+    finder = AirfoilFinder()
 
